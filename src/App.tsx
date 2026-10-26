@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { RadarProvider } from './context/RadarContext'
 import { AppLayout } from './components/layout/AppLayout'
 
@@ -11,7 +11,7 @@ import { Saved } from './pages/Saved'
 import { Tracker } from './pages/Tracker'
 import { Deadlines } from './pages/Deadlines'
 import { Profile } from './pages/Profile'
-import { Settings } from './pages/Settings'
+import { Admin } from './pages/Admin'
 import { NotFound } from './pages/NotFound'
 
 export const App: React.FC = () => {
@@ -27,7 +27,8 @@ export const App: React.FC = () => {
             <Route path="tracker" element={<Tracker />} />
             <Route path="deadlines" element={<Deadlines />} />
             <Route path="profile" element={<Profile />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="admin" element={<Admin />} />
+            <Route path="settings" element={<Navigate to="/admin" replace />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>

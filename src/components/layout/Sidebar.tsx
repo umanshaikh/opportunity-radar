@@ -7,7 +7,7 @@ import {
   Kanban,
   Clock,
   User,
-  Settings,
+  Shield,
   Sparkles,
   AlertCircle,
 } from 'lucide-react'
@@ -33,7 +33,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
       isUrgent: stats.upcomingDeadlinesCount > 0,
     },
     { name: 'Profile & Interests', path: '/profile', icon: User, count: null },
-    { name: 'Settings & Data', path: '/settings', icon: Settings, count: null },
   ]
 
   return (
@@ -118,8 +117,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ onItemClick }) => {
             localStorage. No paid API required.
           </span>
         </div>
-        <div className="mt-2 text-center text-[10px] text-slate-500">
-          OpportunityRadar v1.0.0-hackathon
+        <div className="mt-2.5 flex items-center justify-between text-[10px] text-slate-500 px-1">
+          <span>OpportunityRadar v1.0</span>
+          <NavLink
+            to="/admin"
+            onClick={onItemClick}
+            className="flex items-center gap-1 text-slate-500 hover:text-violet-400 transition"
+          >
+            <Shield className="w-3 h-3" />
+            <span>Admin</span>
+          </NavLink>
         </div>
       </div>
     </aside>

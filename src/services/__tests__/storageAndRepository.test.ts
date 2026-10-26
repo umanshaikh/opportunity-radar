@@ -6,7 +6,7 @@ import {
   getStorageStats,
   safeGetItem,
 } from '../storage'
-import { repository } from '../repository'
+import { localRepository as repository } from '../repository'
 import type { UserProfile } from '../../types'
 
 // Simple in-memory localStorage mock for node environment

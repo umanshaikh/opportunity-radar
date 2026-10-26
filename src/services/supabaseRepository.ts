@@ -9,17 +9,19 @@ import type { DataRepository } from './repository'
 import { getSupabaseClient } from './supabaseClient'
 import { SAMPLE_OPPORTUNITIES } from '../data/sampleOpportunities'
 import { DEFAULT_PROFILE } from './storage'
+import { autoSyncToSupabase, getAllMergedOpportunities } from './liveSyncService'
 
 export class SupabaseRepository implements DataRepository {
   async getOpportunities(): Promise<Opportunity[]> {
     const supabase = getSupabaseClient()
-    if (!supabase) return SAMPLE_OPPORTUNITIES
+    if (!supabase) return getAllMergedOpportunities()
 
     try {
       const { data, error } = await supabase.from('opportunities').select('*')
       if (error || !data || data.length === 0) {
-        // Fallback to sample if table is empty or error
-        return SAMPLE_OPPORTUNITIES
+        // Automatically seed Supabase with live and sample opportunities in background
+        autoSyncToSupabase().catch(err => console.warn('Background auto-seed:', err))
+        return getAllMergedOpportunities()
       }
 
       return data.map(row => ({

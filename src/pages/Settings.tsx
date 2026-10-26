@@ -29,6 +29,7 @@ import {
   SUPABASE_STORAGE_KEY_URL,
   SUPABASE_STORAGE_KEY_ANON,
 } from '../services/supabaseClient'
+import { autoSyncToSupabase } from '../services/liveSyncService'
 import { ConfirmationModal } from '../components/common/ConfirmationModal'
 
 export const Settings: React.FC = () => {
@@ -131,16 +132,37 @@ export const Settings: React.FC = () => {
 
     setIsTestingConnection(true)
     const res = await testSupabaseConnection()
+    if (res.success) {
+      await autoSyncToSupabase().catch(console.warn)
+    }
     setIsTestingConnection(false)
 
     setConnectionResult({
       tested: true,
       success: res.success,
-      message: res.message,
+      message: res.success
+        ? `Connected & auto-populated Supabase database! (${res.latencyMs}ms)`
+        : res.message,
       latencyMs: res.latencyMs,
     })
 
     if (res.success) {
+      setTimeout(() => {
+        window.location.reload()
+      }, 1500)
+    }
+  }
+
+  const handleAutoPopulateNow = async () => {
+    setIsTestingConnection(true)
+    const syncRes = await autoSyncToSupabase()
+    setIsTestingConnection(false)
+    setConnectionResult({
+      tested: true,
+      success: syncRes.success,
+      message: syncRes.message,
+    })
+    if (syncRes.success) {
       setTimeout(() => {
         window.location.reload()
       }, 1500)
@@ -330,17 +352,29 @@ export const Settings: React.FC = () => {
               </button>
 
               {isConfigured && (
-                <button
-                  type="button"
-                  onClick={handleTestSupabaseOnly}
-                  disabled={isTestingConnection}
-                  className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5"
-                >
-                  <RefreshCw
-                    className={`w-3.5 h-3.5 text-violet-400 ${isTestingConnection ? 'animate-spin' : ''}`}
-                  />
-                  <span>Test Ping</span>
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={handleAutoPopulateNow}
+                    disabled={isTestingConnection}
+                    className="px-3.5 py-2 bg-violet-600 hover:bg-violet-500 text-white text-xs font-bold rounded-xl shadow-md transition flex items-center gap-1.5"
+                    title="Automatically syncs all live opportunities into Supabase without typing SQL"
+                  >
+                    <span>⚡ Auto-Populate Tables</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleTestSupabaseOnly}
+                    disabled={isTestingConnection}
+                    className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center gap-1.5"
+                  >
+                    <RefreshCw
+                      className={`w-3.5 h-3.5 text-violet-400 ${isTestingConnection ? 'animate-spin' : ''}`}
+                    />
+                    <span>Test Ping</span>
+                  </button>
+                </>
               )}
             </div>
 

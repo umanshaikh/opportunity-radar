@@ -19,10 +19,12 @@ import {
   BookOpen,
   FileText,
   UserCheck,
+  Download,
 } from 'lucide-react'
 import { useRadar } from '../context/RadarContext'
 import { calculateMatchScore, getScoreBadgeStyle } from '../utils/matching'
 import { getDeadlineInfo, getDeadlineBadgeStyle, getRelativeDeadlineLabel } from '../utils/dateUtils'
+import { getGoogleCalendarUrl, downloadIcsCalendar } from '../utils/calendarUtils'
 import { MatchBreakdownModal } from '../components/common/MatchBreakdownModal'
 import { ApplicationModal } from '../components/common/ApplicationModal'
 import { OpportunityCard } from '../components/common/OpportunityCard'
@@ -436,6 +438,36 @@ export const OpportunityDetail: React.FC = () => {
                 </button>
               </div>
             )}
+          </div>
+
+          {/* Calendar Sync Card */}
+          <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-violet-400" />
+              <span>Calendar Sync</span>
+            </h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Never miss this deadline. Sync directly to your calendar with an automatic 24-hour reminder alert.
+            </p>
+            <div className="space-y-2 pt-1">
+              <a
+                href={getGoogleCalendarUrl(opportunity)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-2.5 px-3 rounded-xl bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/40 text-violet-300 hover:text-white text-xs font-bold transition flex items-center justify-center gap-2"
+              >
+                <Calendar className="w-4 h-4 text-violet-400" />
+                <span>Add to Google Calendar</span>
+                <ExternalLink className="w-3 h-3 text-violet-400" />
+              </a>
+              <button
+                onClick={() => downloadIcsCalendar(opportunity)}
+                className="w-full py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold transition flex items-center justify-center gap-2"
+              >
+                <Download className="w-3.5 h-3.5 text-slate-400" />
+                <span>Download .ics File</span>
+              </button>
+            </div>
           </div>
 
           {/* Official Provider Notice */}

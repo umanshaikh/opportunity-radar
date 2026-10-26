@@ -6,9 +6,11 @@ import {
   Flame,
   Calendar,
   Bell,
+  Download,
 } from 'lucide-react'
 import { useRadar } from '../context/RadarContext'
 import { getDeadlineInfo, getRelativeDeadlineLabel, getDeadlineBadgeStyle } from '../utils/dateUtils'
+import { getGoogleCalendarUrl, downloadIcsCalendar } from '../utils/calendarUtils'
 import type { DeadlineUrgency, Opportunity } from '../types'
 
 interface DeadlineSectionConfig {
@@ -271,7 +273,7 @@ export const Deadlines: React.FC = () => {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-3 shrink-0">
+                      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
                         <div className="text-right">
                           <span
                             className={`inline-block px-2.5 py-1 rounded text-xs font-bold border ${bStyle.bg} ${bStyle.text} ${bStyle.border}`}
@@ -284,9 +286,29 @@ export const Deadlines: React.FC = () => {
                           </span>
                         </div>
 
+                        {/* Calendar Quick Sync */}
+                        <div className="flex items-center gap-1">
+                          <a
+                            href={getGoogleCalendarUrl(opp)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Add to Google Calendar"
+                            className="p-2 rounded-lg bg-slate-800 hover:bg-violet-600/30 text-slate-400 hover:text-violet-300 border border-slate-700/60 hover:border-violet-500/40 transition"
+                          >
+                            <Calendar className="w-3.5 h-3.5" />
+                          </a>
+                          <button
+                            onClick={() => downloadIcsCalendar(opp)}
+                            title="Download .ics file"
+                            className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border border-slate-700/60 transition"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
                         <Link
                           to={`/opportunity/${opp.id}`}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white transition"
                         >
                           Review
                         </Link>

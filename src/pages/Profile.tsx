@@ -8,6 +8,7 @@ import {
   GraduationCap,
   Layers,
   TrendingUp,
+  Wand2,
 } from 'lucide-react'
 import type {
   EducationLevel,
@@ -17,6 +18,7 @@ import type {
 } from '../types'
 import { useRadar } from '../context/RadarContext'
 import { calculateMatchScore } from '../utils/matching'
+import { extractProfileFromText } from '../utils/skillExtractor'
 
 const ALL_EDUCATION_LEVELS: EducationLevel[] = [
   'High School',
@@ -91,6 +93,37 @@ export const Profile: React.FC = () => {
   const [customInterest, setCustomInterest] = useState('')
   const [customSkill, setCustomSkill] = useState('')
   const [savedSuccess, setSavedSuccess] = useState(false)
+
+  // Smart Resume / Bio Scanner State
+  const [showResumeScanner, setShowResumeScanner] = useState(false)
+  const [resumeText, setResumeText] = useState('')
+  const [scanResultNotice, setScanResultNotice] = useState<string | null>(null)
+
+  const handleScanResume = () => {
+    if (!resumeText.trim()) return
+    const extracted = extractProfileFromText(resumeText)
+    if (extracted.matchedKeywordCount === 0) {
+      setScanResultNotice('No recognizable technical skills or keywords detected. Try pasting more project or course details!')
+      return
+    }
+
+    // Merge skills without duplicates
+    setSkills(prev => Array.from(new Set([...prev, ...extracted.skills])))
+
+    // Merge interests without duplicates
+    setInterests(prev => Array.from(new Set([...prev, ...extracted.interests])))
+
+    // Set education level if found
+    if (extracted.educationLevel) {
+      setEducationLevel(extracted.educationLevel)
+    }
+
+    setScanResultNotice(
+      `✨ Auto-detected ${extracted.skills.length} skills, ${extracted.interests.length} interest areas${
+        extracted.educationLevel ? `, and ${extracted.educationLevel} background` : ''
+      }!`
+    )
+  }
 
   // Toggle Handlers
   const toggleCategory = (cat: Category) => {
@@ -192,6 +225,73 @@ export const Profile: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Controls: 2 Columns */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Quick Resume / Bio Scanner */}
+            <div className="p-5 rounded-2xl bg-gradient-to-r from-violet-950/40 via-slate-900 to-indigo-950/40 border border-violet-800/40 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-violet-600/20 border border-violet-500/30 text-violet-400">
+                    <Wand2 className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-bold text-white">Auto-Detect Profile from Resume / Bio</h2>
+                    <p className="text-[11px] text-slate-400">
+                      Paste your resume snippet, LinkedIn bio, or projects to auto-populate your skills instantly.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowResumeScanner(!showResumeScanner)}
+                  className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-violet-600 hover:bg-violet-500 text-white transition shadow-sm"
+                >
+                  {showResumeScanner ? 'Close Scanner' : '✨ Open Scanner'}
+                </button>
+              </div>
+
+              {showResumeScanner && (
+                <div className="space-y-3 pt-2 animate-in fade-in duration-150">
+                  <textarea
+                    rows={4}
+                    value={resumeText}
+                    onChange={e => setResumeText(e.target.value)}
+                    placeholder="Paste your resume summary, LinkedIn profile, or list of tech stacks here (e.g. 'Undergraduate CS student passionate about AI/ML and React. Proficient in Python, TypeScript, Docker, and PostgreSQL...')"
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-xs text-slate-200 placeholder-slate-500 focus:outline-hidden focus:border-violet-500 transition resize-none font-mono"
+                  />
+
+                  <div className="flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={handleScanResume}
+                      disabled={!resumeText.trim()}
+                      className="px-4 py-2 rounded-xl text-xs font-bold bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:hover:bg-violet-600 text-white transition flex items-center gap-2"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Extract & Auto-Fill Skills</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setResumeText(
+                          'Computer Science Undergraduate interested in AI/ML and Web Development. Proficient in Python, React, TypeScript, Node.js, Docker, AWS, and PostgreSQL.'
+                        )
+                      }}
+                      className="text-xs text-violet-400 hover:text-violet-300 font-semibold transition"
+                    >
+                      Insert Example Resume Text
+                    </button>
+                  </div>
+
+                  {scanResultNotice && (
+                    <div className="p-3 rounded-xl bg-violet-950/60 border border-violet-800/60 text-xs text-violet-200 font-medium">
+                      {scanResultNotice}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Academic Level */}
             <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
               <label className="text-sm font-bold text-white flex items-center gap-2">

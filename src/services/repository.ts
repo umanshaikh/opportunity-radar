@@ -14,6 +14,8 @@ import {
   initializeStorageIfEmpty,
 } from './storage'
 import { SAMPLE_OPPORTUNITIES } from '../data/sampleOpportunities'
+import { isSupabaseConfigured } from './supabaseClient'
+import { SupabaseRepository } from './supabaseRepository'
 
 // Guarantee storage is initialized
 initializeStorageIfEmpty()
@@ -173,5 +175,22 @@ class LocalStorageRepository implements DataRepository {
   }
 }
 
-// Single export instance conforming to DataRepository
-export const repository: DataRepository = new LocalStorageRepository()
+// Single export instances
+export const localRepository: DataRepository = new LocalStorageRepository()
+export const supabaseRepository: DataRepository = new SupabaseRepository()
+
+export function getActiveRepository(): DataRepository {
+  if (isSupabaseConfigured()) {
+    return supabaseRepository
+  }
+  return localRepository
+}
+
+// Dynamic delegating proxy
+export const repository: DataRepository = new Proxy({} as DataRepository, {
+  get(_target, prop) {
+    const active = getActiveRepository()
+    const value = (active as unknown as Record<string, unknown>)[prop as string]
+    return typeof value === 'function' ? (value as (...args: unknown[]) => unknown).bind(active) : value
+  },
+})

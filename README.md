@@ -1,5 +1,8 @@
 # OpportunityRadar
 
+[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-000000?style=flat&logo=vercel&logoColor=white)](https://opportunity-radar-pied.vercel.app)
+[![Live Site](https://img.shields.io/badge/Live%20Demo-opportunity--radar--pied.vercel.app-7928CA)](https://opportunity-radar-pied.vercel.app)
+
 > **Find opportunities. Beat deadlines.**
 
 OpportunityRadar is an algorithmic opportunity discovery engine and deadline tracker built specifically for students and early-career builders. It aggregates hackathons, internships, scholarships, competitions, fellowships, college symposiums, and free learning programs into a single radar screen.
